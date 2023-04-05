@@ -54,6 +54,7 @@
                   </div>
                   <button
                     @click="putClick"
+                    :key="render"
                     type="button"
                     class="float-right inline-flex items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                   >
@@ -79,45 +80,41 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 import { CheckIcon } from "@heroicons/vue/24/outline";
-
+ const getData=await useAuthLazyFetch(
+  "https://v1-orm-lib.mars.hipso.cc/notes/entity/TASKS/1360?project_id=111&offset=0&limit=100&sort_column=id&sort_direction=desc"
+);
+const note=ref("")
+note.value = getData.data._rawValue;
 const open = ref(true);
 const props = defineProps({
   filled_note: {
     type: String,
     default: "",
   },
-
+uid:{
+    type:String
+}
 });
 const prefilledNote = ref("");
 const emit = defineEmits(["openModal"]);
 prefilledNote.value = props.filled_note;
+const render=ref(0)
 async function putClick() {
-//   const putOptions = {
-
-//     body: JSON.stringify({
-//       entity_id: "1361",
-//       project_id: "111",
-//       note: prefilledNote.value,
-//       entity: "TASKS",
-//     }),
-//   };
-//   const addTemplateData = useAuthLazyFetchPut(
-//     `https://v1-orm-lib.mars.hipso.cc/notes/${props.uid}`,
-  
-
-//     putOptions
-//   );
-
-
 let body={
    entity_id: "1360",
       project_id: "111",
       note: prefilledNote.value,
       entity: "TASKS",
-      uid:'98ffbaa9-3675-4257-a08b-b605c79dbdc4'
+      uid:props.uid
 }
-const { data: items, pending } =   await useAuthLazyFetchPut( `https://v1-orm-lib.mars.hipso.cc/notes/98ffbaa9-3675-4257-a08b-b605c79dbdc4`,{body: JSON.stringify(body)})
-console.log("this.data",items,pending)
+const { data: items, pending } =   await useAuthLazyFetchPut( `https://v1-orm-lib.mars.hipso.cc/notes/${props.uid}`,{body: JSON.stringify(body)})
+
+note.value.forEach((item,index)=>{
+    if(item.uid==props.uid){
+      render.value=render.value+1
+    item.note=prefilledNote.value
+    
+      }})
   emit("openModal");
 }
 
