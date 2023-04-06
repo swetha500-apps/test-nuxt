@@ -53,7 +53,7 @@
                     />
                   </div>
                   <button
-                    @click="putClick"
+                    @click="putData"
                     :key="render"
                     type="button"
                     class="float-right inline-flex items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
@@ -80,11 +80,6 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 import { CheckIcon } from "@heroicons/vue/24/outline";
- const getData=await useAuthLazyFetch(
-  "https://v1-orm-lib.mars.hipso.cc/notes/entity/TASKS/1360?project_id=111&offset=0&limit=100&sort_column=id&sort_direction=desc"
-);
-const note=ref("")
-note.value = getData.data._rawValue;
 const open = ref(true);
 const props = defineProps({
   filled_note: {
@@ -93,33 +88,14 @@ const props = defineProps({
   },
 uid:{
     type:String
-}
+},
+
 });
 const prefilledNote = ref("");
-const emit = defineEmits(["openModal"]);
+const emit = defineEmits(["putData"]);
 prefilledNote.value = props.filled_note;
-const render=ref(0)
-async function putClick() {
-let body={
-   entity_id: "1360",
-      project_id: "111",
-      note: prefilledNote.value,
-      entity: "TASKS",
-      uid:props.uid
+function putData(){
+   emit("putData",prefilledNote)
+   open.value=false
 }
-const { data: items, pending } =   await useAuthLazyFetchPut( `https://v1-orm-lib.mars.hipso.cc/notes/${props.uid}`,{body: JSON.stringify(body)})
-
-note.value.forEach((item,index)=>{
-    if(item.uid==props.uid){
-      render.value=render.value+1
-    item.note=prefilledNote.value
-    
-      }})
-  emit("openModal");
-}
-
-
-
-
-
 </script>
